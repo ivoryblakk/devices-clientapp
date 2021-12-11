@@ -1,0 +1,73 @@
+{
+  "root": "apps/devices-clientapp",
+  "sourceRoot": "apps/devices-clientapp/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/devices-clientapp",
+        "index": "apps/devices-clientapp/src/index.html",
+        "baseHref": "/",
+        "main": "apps/devices-clientapp/src/main.tsx",
+        "polyfills": "apps/devices-clientapp/src/polyfills.ts",
+        "tsConfig": "apps/devices-clientapp/tsconfig.app.json",
+        "assets": [
+          "apps/devices-clientapp/src/favicon.ico",
+          "apps/devices-clientapp/src/assets"
+        ],
+        "styles": ["apps/devices-clientapp/src/styles.scss"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/devices-clientapp/src/environments/environment.ts",
+              "with": "apps/devices-clientapp/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/web:dev-server",
+      "options": {
+        "buildTarget": "devices-clientapp:build",
+        "hmr": true,
+        "proxyConfig": "apps/devices-clientapp/proxy.conf.json"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "devices-clientapp:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/devices-clientapp/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/devices-clientapp"],
+      "options": {
+        "jestConfig": "apps/devices-clientapp/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
