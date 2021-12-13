@@ -14,7 +14,7 @@ const A_Z = 'a_z'
 export const DeviceListComponent = () => {
     const [showModal, setShowModal] = useState(false);
     const [showAddSystemModal, setShowAddSystemModal] = useState(false);
-    const { list, isLoading } = useFetchDevices();
+    const { list, isLoading, error } = useFetchDevices();
     const [sortedDeviceList, setSortedDeviceList] = useState([])
     const [deviceTypeSortList, setDeviceTypeSortList] = useState([]);
     const [HDDCapacitySortList, setHDDCapacitySortList] = useState([]);
@@ -37,7 +37,7 @@ export const DeviceListComponent = () => {
 
     useEffect(() => {
         sortDevices();
-    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList,list]);
+    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList, list]);
 
     const sortDevices = () => {
         let sortedList = list
@@ -54,6 +54,7 @@ export const DeviceListComponent = () => {
         setSortedDeviceList(sortedList)
 
     }
+
     const setDeviceTypeKeys = () => {
         const keys = list.map((device) => device.type);
         const noDuplicateKeys = keys.filter(
@@ -88,7 +89,7 @@ export const DeviceListComponent = () => {
         const hasDeviceTypeSortList = (deviceTypeSortList.length > 1)
 
         return <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic"  className='text-light text-wrap'>
+            <Dropdown.Toggle variant="" id="dropdown-basic" className='text-light text-wrap'>
                 Sort by Type
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -98,14 +99,13 @@ export const DeviceListComponent = () => {
                 )}
             </Dropdown.Menu>
         </Dropdown>;
-
     }
 
     const hDDCapactityDropDown = () => {
         const hasHDDCapacitySortList = (HDDCapacitySortList.length > 1)
 
         return <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic"  className='text-light text-wrap'>
+            <Dropdown.Toggle variant="" id="dropdown-basic" className='text-light text-wrap'>
                 Sort by HDD Capacity
             </Dropdown.Toggle>
             <Dropdown.Menu >
@@ -116,7 +116,6 @@ export const DeviceListComponent = () => {
                 )}
             </Dropdown.Menu>
         </Dropdown>;
-
     }
 
     const systemNameDropDown = () => {
@@ -129,7 +128,6 @@ export const DeviceListComponent = () => {
                 <Dropdown.Item eventKey={A_Z} onClick={() => setDeviceNameSortBy(A_Z)} active={deviceNameSortBy === A_Z}>A-Z</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>;
-
     }
 
 
@@ -137,7 +135,7 @@ export const DeviceListComponent = () => {
         return (
             <div className="row ">
                 <div className="col-7 bg-black p-2 ">
-                    <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={()=>setShowAddSystemModal(true)}>Add System</Button></div>
+                    <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={() => setShowAddSystemModal(true)}>Add System</Button></div>
                 </div>
             </div>
         );
@@ -147,11 +145,18 @@ export const DeviceListComponent = () => {
     // console.log('HDDCapacitySortList', HDDCapacitySortList);
     // console.log('deviceTypeSortBy', deviceTypeSortBy);
     // console.log('HDDCapacitySortBy', HDDCapacitySortBy);
-    console.log('sortedDeviceList', sortedDeviceList);
-
+   // console.log('sortedDeviceList', sortedDeviceList);
     return isLoading ? (
-        <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
-    ) : (
+        <div className="row">
+            <div className="col-7 p-0 pt-5 d-flex justify-content-center">
+                <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
+            </div>
+        </div>
+    ) : error ? (<div className="row">
+        <div className="col-7 p-0 pt-5 d-flex justify-content-center">
+            Something went wrong
+        </div>
+    </div>) : (
         <>
             {deviceDetailsHeader()}
             <div className="row">
@@ -170,7 +175,7 @@ export const DeviceListComponent = () => {
                                             </p>
                                             <p className="m-0">{`HDD Capacity (GB): ${hdd_capacity} `}</p>
                                         </div>
-                                        <div className="col-2 pt-3">
+                                        <div className="col-2 align-self-center mx-auto d-flex justify-content-end">
                                             <Button
                                                 className="bg-white btn-light"
                                                 onClick={() =>
@@ -180,8 +185,7 @@ export const DeviceListComponent = () => {
                                                         hdd_capacity,
                                                         id,
                                                     })
-                                                }
-                                            >
+                                                }>
                                                 {pencilSVG}
                                             </Button>
                                         </div>
@@ -197,6 +201,7 @@ export const DeviceListComponent = () => {
                 onHide={closeModal}
             />
             <AddSystemModalComponent
+                deviceTypeOptions={deviceTypeSortList}
                 show={showAddSystemModal}
                 onHide={closeAddSystemModal}
             />
