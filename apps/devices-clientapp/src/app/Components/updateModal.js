@@ -11,7 +11,6 @@ export const UpdateModalComponent = ({deviceDetails, closeModal, show, onHide}) 
         backdrop="static"
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
-        centered
       >
         <Modal.Header >
           <Modal.Title id="contained-modal-title-vcenter">
