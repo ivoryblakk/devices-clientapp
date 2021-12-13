@@ -15,7 +15,7 @@ export const DeviceListComponent = () => {
     const [showModal, setShowModal] = useState(false);
     const [showAddSystemModal, setShowAddSystemModal] = useState(false);
     const { list, isLoading } = useFetchDevices();
-    const [sortedDeviceList, setSortedDeviceList] = useState(list)
+    const [sortedDeviceList, setSortedDeviceList] = useState([])
     const [deviceTypeSortList, setDeviceTypeSortList] = useState([]);
     const [HDDCapacitySortList, setHDDCapacitySortList] = useState([]);
     const [deviceNameSortBy, setDeviceNameSortBy] = useState('')
@@ -37,7 +37,7 @@ export const DeviceListComponent = () => {
 
     useEffect(() => {
         sortDevices();
-    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy]);
+    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList,list]);
 
     const sortDevices = () => {
         let sortedList = list
@@ -88,7 +88,7 @@ export const DeviceListComponent = () => {
         const hasDeviceTypeSortList = (deviceTypeSortList.length > 1)
 
         return <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic">
+            <Dropdown.Toggle variant="" id="dropdown-basic"  className='text-light text-wrap'>
                 Sort by Type
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -105,7 +105,7 @@ export const DeviceListComponent = () => {
         const hasHDDCapacitySortList = (HDDCapacitySortList.length > 1)
 
         return <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic">
+            <Dropdown.Toggle variant="" id="dropdown-basic"  className='text-light text-wrap'>
                 Sort by HDD Capacity
             </Dropdown.Toggle>
             <Dropdown.Menu >
@@ -121,7 +121,7 @@ export const DeviceListComponent = () => {
 
     const systemNameDropDown = () => {
         return <Dropdown>
-            <Dropdown.Toggle variant="" id="dropdown-basic">
+            <Dropdown.Toggle variant="" id="dropdown-basic" className='text-light text-wrap'>
                 Sort by System Name
             </Dropdown.Toggle>
             <Dropdown.Menu >
@@ -135,9 +135,9 @@ export const DeviceListComponent = () => {
 
     const deviceDetailsHeader = () => {
         return (
-            <div className="row">
-                <div className="col-4">
-                    <span>{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={()=>setShowAddSystemModal(true)}>Add System</Button></span>
+            <div className="row ">
+                <div className="col-7 bg-black p-2 ">
+                    <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={()=>setShowAddSystemModal(true)}>Add System</Button></div>
                 </div>
             </div>
         );
@@ -147,7 +147,7 @@ export const DeviceListComponent = () => {
     // console.log('HDDCapacitySortList', HDDCapacitySortList);
     // console.log('deviceTypeSortBy', deviceTypeSortBy);
     // console.log('HDDCapacitySortBy', HDDCapacitySortBy);
-    //console.log('sortedDeviceList', sortedDeviceList);
+    console.log('sortedDeviceList', sortedDeviceList);
 
     return isLoading ? (
         <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
@@ -155,13 +155,13 @@ export const DeviceListComponent = () => {
         <>
             {deviceDetailsHeader()}
             <div className="row">
-                <div className="col-4">
+                <div className="col-7 p-0">
                     {sortedDeviceList.length === 0 && !isLoading ? <div>
                         No Systems match your search criteria
                     </div> :
-                        <ul>
+                        <ul className="p-0">
                             {sortedDeviceList.map(({ system_name, type, hdd_capacity, id }) => (
-                                <li className="p-2 m-1 border border-dark rounded" key={id}>
+                                <li className="p-2 m-1 border shadow rounded" key={id}>
                                     <div className="row">
                                         <div className="col-10">
                                             <p className="m-0"> {`System Name: ${system_name}`}</p>
@@ -170,10 +170,9 @@ export const DeviceListComponent = () => {
                                             </p>
                                             <p className="m-0">{`HDD Capacity (GB): ${hdd_capacity} `}</p>
                                         </div>
-                                        <div className="col-2">
-                                            <button
-                                                type="button"
-                                                className="rounded-circle"
+                                        <div className="col-2 pt-3">
+                                            <Button
+                                                className="bg-white btn-light"
                                                 onClick={() =>
                                                     updateDeviceModal({
                                                         system_name,
@@ -184,7 +183,7 @@ export const DeviceListComponent = () => {
                                                 }
                                             >
                                                 {pencilSVG}
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 </li>
