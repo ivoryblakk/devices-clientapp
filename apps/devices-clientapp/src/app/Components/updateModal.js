@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Button, Form, Col } from 'react-bootstrap'
 import { Formik } from 'formik';
 import { updateDevice, deleteDevice, fetchDevices } from './slice';
+import { parseTypeString } from '../utilites/utility';
 import { useDispatch } from 'react-redux'
 
 export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, onHide }) => {
@@ -31,21 +32,29 @@ export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, o
           initialValues={{ system_name: deviceDetails.system_name, type: deviceDetails.type, hdd_capacity: deviceDetails.hdd_capacity }}
           validate={values => {
             const errors = {};
-            // if (!values.email) {
-            //   errors.email = 'Required';
-            // } else if (
-            //   !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-            // ) {
-            //   errors.email = 'Invalid email address';
-            // }
+            if(!values.system_name){
+              errors.system_name = 'Required'
+            }
+            if(!/^[a-zA-Z-]+$/gm.test(values.system_name) && values.system_name){
+              errors.system_name = 'Please use Letters and/or hypens'
+            }
+            if(!values.type){
+              errors.type = 'Required'
+            }
+            if(!values.hdd_capacity){
+              errors.hdd_capacity = 'Required'
+            }
+            if( 1 >= values.hdd_capacity && values.hdd_capacity ){
+              errors.hdd_capacity = 'Please use a Valid Positive Number'
+            }
             return errors;
           }}
           onSubmit={ async(values, { setSubmitting }) => {
             const { system_name, type, hdd_capacity } = values
             await dispatch(updateDevice({ system_name, type, hdd_capacity, id: deviceDetails.id }));
-            await dispatch(fetchDevices());
-            setSubmitting(false);
             onHide();
+            setSubmitting(false);
+             dispatch(fetchDevices());
           }}
         >
           {({
@@ -55,8 +64,7 @@ export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, o
             handleChange,
             handleBlur,
             handleSubmit,
-            isSubmitting,
-            /* and other goodies */
+            isSubmitting
           }) => (
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -71,8 +79,9 @@ export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, o
 
               <Form.Group className="mb-3" as={Col} controlId="formGridState">
                 <Form.Label>Type</Form.Label>
-                <Form.Select name="type" onChange={handleChange}>
-                  {deviceTypeOptions.map((type) => <option value={type} key={type} >{type}</option>)}
+                <Form.Select name="type" defaultValue={ deviceDetails.type} onChange={handleChange}>
+                <option value={''}>Choose...</option>
+                  {deviceTypeOptions.map((type) => <option value={type} key={type} >{parseTypeString(type)}</option>)}
                 </Form.Select>
                 <Form.Text className="text-danger">
                   {errors.type && touched.type && errors.type}

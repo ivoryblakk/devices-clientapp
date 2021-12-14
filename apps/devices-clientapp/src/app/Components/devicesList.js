@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useFetchDevices } from '../hooks/useFetchDevices';
 import { appleSVG, windowsSVG, pencilSVG } from '../assets/Icons';
 import { UpdateModalComponent } from '../Components/updateModal';
 import { AddSystemModalComponent } from '../Components/addSystemModal';
 import { Dropdown, Button } from 'react-bootstrap'
 import Loader from 'react-loader-spinner';
 import { sortBy } from 'lodash';
+import { parseTypeString } from '../utilites/utility';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchDevices, devicesListSelector } from './slice';
 
 const MAC = 'MAC';
 const HDD_CAPACITY = 'hdd_capacity'
 const A_Z = 'a_z'
+let deviceTypes = ['WINDOWS_WORKSTATION','WINDOWS_SERVER','MAC']
 
 export const DeviceListComponent = () => {
     const dispatch = useDispatch()
     const devicesList = useSelector(devicesListSelector.selectAll)
-    const {isFetching, error, addedDeviceDetails, updatedDevice,deletedDevice} = useSelector(state=>state.devicesList)
+    const { isFetching, error, addedDeviceDetails, updatedDevice, deletedDevice } = useSelector(state => state.devicesList)
     const [showModal, setShowModal] = useState(false);
     const [showAddSystemModal, setShowAddSystemModal] = useState(false);
     const [sortedDeviceList, setSortedDeviceList] = useState([])
@@ -32,12 +33,9 @@ export const DeviceListComponent = () => {
         id: '',
     });
 
-    const saveDeviceDetails = ({ system_name, type, hdd_capacity, id }) =>
-        setDeviceDetails({ system_name, type, hdd_capacity, id });
-
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(fetchDevices())
-    },[ dispatch, addedDeviceDetails, updatedDevice, deletedDevice])
+    }, [dispatch, addedDeviceDetails, updatedDevice, deletedDevice])
 
     useEffect(() => {
         setDeviceTypeKeys();
@@ -47,6 +45,9 @@ export const DeviceListComponent = () => {
     useEffect(() => {
         sortDevices();
     }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList, devicesList]);
+
+    const saveDeviceDetails = ({ system_name, type, hdd_capacity, id }) =>
+        setDeviceDetails({ system_name, type, hdd_capacity, id });
 
     const sortDevices = () => {
         let sortedList = devicesList
@@ -64,12 +65,14 @@ export const DeviceListComponent = () => {
 
     }
 
+    const hasfilters = deviceTypeSortBy || deviceNameSortBy || HDDCapacitySortBy
+
     const setDeviceTypeKeys = () => {
-        const keys = devicesList.map((device) => device.type);
-        const noDuplicateKeys = keys.filter(
-            (device, index) => keys.indexOf(device) === index
-        );
-        setDeviceTypeSortList(noDuplicateKeys);
+         devicesList.map((device) => {
+           deviceTypes.includes(device.type)? null: deviceTypes.push(device.type)
+        });
+
+        setDeviceTypeSortList(deviceTypes);
     };
 
     const setHDDCapacityKeys = () => {
@@ -104,7 +107,7 @@ export const DeviceListComponent = () => {
             <Dropdown.Menu>
                 <Dropdown.Item eventKey="" onClick={() => setDeviceTypeSortBy('')} key={'all'} active={deviceTypeSortBy === ''}>All</Dropdown.Item>
                 {hasDeviceTypeSortList && deviceTypeSortList.map((device, i) =>
-                    <Dropdown.Item eventKey={device} onClick={() => setDeviceTypeSortBy(device)} key={device + i} active={deviceTypeSortBy == device}>{device}</Dropdown.Item>
+                    <Dropdown.Item eventKey={device} onClick={() => setDeviceTypeSortBy(device)} key={device + i} active={deviceTypeSortBy == device}>{parseTypeString(device)}</Dropdown.Item>
                 )}
             </Dropdown.Menu>
         </Dropdown>;
@@ -121,7 +124,6 @@ export const DeviceListComponent = () => {
                 <Dropdown.Item eventKey='' onClick={() => setHDDCapacitySortBy('')} key={'all'} active={HDDCapacitySortBy === ''}>All</Dropdown.Item>
                 {hasHDDCapacitySortList && HDDCapacitySortList.map((giga, i) =>
                     <Dropdown.Item eventKey={`${giga}`} onClick={() => setHDDCapacitySortBy(giga)} key={giga + i} active={HDDCapacitySortBy === giga}>{`${giga} GB`}</Dropdown.Item>
-
                 )}
             </Dropdown.Menu>
         </Dropdown>;
@@ -164,8 +166,10 @@ export const DeviceListComponent = () => {
             {deviceDetailsHeader()}
             <div className="row">
                 <div className="col-7 p-0">
-                    {sortedDeviceList.length === 0 && !isFetching ? <div>
+                    {sortedDeviceList.length === 0 && !isFetching && hasfilters  ? <div>
                         No Systems match your search criteria
+                    </div>: sortedDeviceList.length === 0 && !isFetching? <div> 
+                        There are no System Devices
                     </div> :
                         <ul className="p-0">
                             {sortedDeviceList.map(({ system_name, type, hdd_capacity, id }) => (
@@ -174,9 +178,9 @@ export const DeviceListComponent = () => {
                                         <div className="col-10">
                                             <p className="m-0"> {`System Name: ${system_name}`}</p>
                                             <p className="m-0">
-                                                Type: {type === MAC ? appleSVG : windowsSVG} {type}
+                                                Type: {type === MAC ? appleSVG : windowsSVG} {`${parseTypeString(type)}`}
                                             </p>
-                                            <p className="m-0">{`HDD Capacity (GB): ${hdd_capacity} `}</p>
+                                            <p className="m-0">{`HDD Capacity (GB): ${hdd_capacity} GB`}</p>
                                         </div>
                                         <div className="col-2 align-self-center mx-auto d-flex justify-content-end">
                                             <Button
