@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Modal, Button, Form, Col } from 'react-bootstrap'
 import { Formik } from 'formik';
-import { usePostDevice } from '../hooks/usePostDevice'
+import { addDevice } from './slice';
+import { useDispatch } from 'react-redux'
+import { parseTypeString } from '../../utilites/utility';
 
 export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => {
-  const { setPostData, succcesData, isLoading } = usePostDevice();
-
+  const dispatch = useDispatch()
   return (
     <Modal
       show={show}
@@ -24,18 +25,29 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
           initialValues={{ system_name: '', type: '', hdd_capacity: '' }}
           validate={values => {
             const errors = {};
-            // if (!values.email) {
-            //   errors.email = 'Required';
-            // } else if (
-            //   !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-            // ) {
-            //   errors.email = 'Invalid email address';
-            // }
+            if(!values.system_name){
+              errors.system_name = 'Required'
+            }
+            if(!/^[a-zA-Z-]+$/gm.test(values.system_name) && values.system_name){
+              errors.system_name = 'Please use Letters and/or hypens'
+            }
+            if(!values.type){
+              errors.type = 'Required'
+            }
+            console.log('values.type', values.type)
+
+            if(!values.hdd_capacity){
+              errors.hdd_capacity = 'Required'
+            }
+
+            if( 1 >= values.hdd_capacity && values.hdd_capacity ){
+              errors.hdd_capacity = 'Please use a Valid Positive Number'
+            }
             return errors;
           }}
-          onSubmit={(values, { setSubmitting }) => {
-            const {system_name, type, hdd_capacity} = values
-            setPostData({ system_name, type, hdd_capacity });
+          onSubmit={ async(values, { setSubmitting }) => {
+            const { system_name, type, hdd_capacity } = values
+            await dispatch(addDevice({ system_name, type, hdd_capacity }));
             setSubmitting(false);
             onHide();
           }}
@@ -47,13 +59,12 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
             handleChange,
             handleBlur,
             handleSubmit,
-            isSubmitting,
-            /* and other goodies */
+            isSubmitting
           }) => (
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>System Name</Form.Label>
-                <Form.Control type="text" name="system_name"  onChange={handleChange}
+                <Form.Control type="text" name="system_name" onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.system_name} />
                 <Form.Text className="text-danger">
@@ -63,8 +74,9 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
 
               <Form.Group className="mb-3" as={Col} controlId="formGridState">
                 <Form.Label>Type</Form.Label>
-                <Form.Select name="type"  onChange={handleChange} defaultValue="Choose...">
-                  {deviceTypeOptions.map((type)=> <option value={type} key={type} >{type}</option>)}
+                <Form.Select name="type" onChange={handleChange} >
+                <option value={''}>Choose...</option>
+                  {deviceTypeOptions.map((type) => <option value={type} key={type} >{parseTypeString(type)}</option>)}
                 </Form.Select>
                 <Form.Text className="text-danger">
                   {errors.type && touched.type && errors.type}
@@ -73,7 +85,7 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>HDD Capacity GB</Form.Label>
-                <Form.Control type="number"  name="hdd_capacity" onChange={handleChange}
+                <Form.Control type="number" name="hdd_capacity" onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.hdd_capacity}
                 />
@@ -93,39 +105,3 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
     </Modal>
   );
 };
-
-{/*<form> <div className="row">
-                <div  className="col-5">
-                <input
-                type="email"
-                name="email"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.email}
-              />
-              {errors.email && touched.email && errors.email}
-                </div>
-              </div>
-              <div className="row">
-                <div  className="col-5">
-
-                </div>
-              </div>
-              <div className="row">
-                <div  className="col-5">
-
-                <input
-                type="password"
-                name="password"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.password}
-              />
-                </div>
-              </div>
-           
-              {errors.password && touched.password && errors.password}
-              <Button onClick={onHide}>Close</Button>
-              <button type="submit" disabled={isSubmitting}>
-                Submit
-              </button>  </form>*/}
