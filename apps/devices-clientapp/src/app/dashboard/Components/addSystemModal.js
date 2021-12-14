@@ -17,7 +17,7 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
     >
       <Modal.Header >
         <Modal.Title id="contained-modal-title-vcenter">
-          Add System
+          Add System Device
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

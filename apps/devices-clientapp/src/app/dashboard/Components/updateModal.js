@@ -25,7 +25,7 @@ export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, o
          await  dispatch(fetchDevices());
           onHide();
         }
-        }>Delete System</Button>
+        }>Delete System Device</Button>
       </Modal.Header>
       <Modal.Body>
         <Formik
