@@ -17,7 +17,7 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
     >
       <Modal.Header >
         <Modal.Title id="contained-modal-title-vcenter">
-          Add System
+          Add System Device
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -34,7 +34,6 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
             if(!values.type){
               errors.type = 'Required'
             }
-            console.log('values.type', values.type)
 
             if(!values.hdd_capacity){
               errors.hdd_capacity = 'Required'
