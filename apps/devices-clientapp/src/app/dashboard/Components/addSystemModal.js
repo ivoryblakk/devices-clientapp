@@ -3,7 +3,7 @@ import { Modal, Button, Form, Col } from 'react-bootstrap'
 import { Formik } from 'formik';
 import { addDevice } from './slice';
 import { useDispatch } from 'react-redux'
-import { parseTypeString } from '../utilites/utility';
+import { parseTypeString } from '../../utilites/utility';
 
 export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => {
   const dispatch = useDispatch()

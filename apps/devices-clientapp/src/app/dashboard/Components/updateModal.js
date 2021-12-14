@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button, Form, Col } from 'react-bootstrap'
 import { Formik } from 'formik';
 import { updateDevice, deleteDevice, fetchDevices } from './slice';
-import { parseTypeString } from '../utilites/utility';
+import { parseTypeString } from '../../utilites/utility';
 import { useDispatch } from 'react-redux'
 
 export const UpdateModalComponent = ({ deviceTypeOptions, deviceDetails, show, onHide }) => {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { appleSVG, windowsSVG, pencilSVG } from '../assets/Icons';
+import { appleSVG, windowsSVG, pencilSVG } from '../../assets/Icons';
 import { UpdateModalComponent } from '../Components/updateModal';
 import { AddSystemModalComponent } from '../Components/addSystemModal';
 import { Dropdown, Button } from 'react-bootstrap'
 import Loader from 'react-loader-spinner';
 import { sortBy } from 'lodash';
-import { parseTypeString } from '../utilites/utility';
+import { parseTypeString } from '../../utilites/utility';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchDevices, devicesListSelector } from './slice';
 

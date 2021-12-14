@@ -1,5 +1,5 @@
 import React from "react";
-import {DeviceListComponent} from '../Components/devicesList'
+import {DeviceListComponent} from './Components/devicesList'
 
 
 export const DashboardComponent =()=>{
