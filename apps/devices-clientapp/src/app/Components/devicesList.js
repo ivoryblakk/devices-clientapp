@@ -6,15 +6,19 @@ import { AddSystemModalComponent } from '../Components/addSystemModal';
 import { Dropdown, Button } from 'react-bootstrap'
 import Loader from 'react-loader-spinner';
 import { sortBy } from 'lodash';
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchDevices, devicesListSelector } from './slice';
 
 const MAC = 'MAC';
 const HDD_CAPACITY = 'hdd_capacity'
 const A_Z = 'a_z'
 
 export const DeviceListComponent = () => {
+    const dispatch = useDispatch()
+    const devicesList = useSelector(devicesListSelector.selectAll)
+    const {isFetching, error, addedDeviceDetails, updatedDevice,deletedDevice} = useSelector(state=>state.devicesList)
     const [showModal, setShowModal] = useState(false);
     const [showAddSystemModal, setShowAddSystemModal] = useState(false);
-    const { list, isLoading, error } = useFetchDevices();
     const [sortedDeviceList, setSortedDeviceList] = useState([])
     const [deviceTypeSortList, setDeviceTypeSortList] = useState([]);
     const [HDDCapacitySortList, setHDDCapacitySortList] = useState([]);
@@ -27,22 +31,27 @@ export const DeviceListComponent = () => {
         hdd_capacity: '',
         id: '',
     });
-    const saveDeviceDetaiils = ({ system_name, type, hdd_capacity, id }) =>
+
+    const saveDeviceDetails = ({ system_name, type, hdd_capacity, id }) =>
         setDeviceDetails({ system_name, type, hdd_capacity, id });
+
+    useEffect(()=>{
+        dispatch(fetchDevices())
+    },[ dispatch, addedDeviceDetails, updatedDevice, deletedDevice])
 
     useEffect(() => {
         setDeviceTypeKeys();
         setHDDCapacityKeys();
-    }, [list]);
+    }, [devicesList]);
 
     useEffect(() => {
         sortDevices();
-    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList, list]);
+    }, [deviceTypeSortBy, HDDCapacitySortBy, deviceNameSortBy, sortedDeviceList, devicesList]);
 
     const sortDevices = () => {
-        let sortedList = list
+        let sortedList = devicesList
 
-        sortedList = deviceNameSortBy === A_Z ? sortBy(sortedList, (o) => o['system_name'].toLowerCase()) : list;
+        sortedList = deviceNameSortBy === A_Z ? sortBy(sortedList, (o) => o['system_name'].toLowerCase()) : devicesList;
 
         if (deviceTypeSortBy) {
             sortedList = sortedList.filter((device) => device.type === deviceTypeSortBy)
@@ -56,7 +65,7 @@ export const DeviceListComponent = () => {
     }
 
     const setDeviceTypeKeys = () => {
-        const keys = list.map((device) => device.type);
+        const keys = devicesList.map((device) => device.type);
         const noDuplicateKeys = keys.filter(
             (device, index) => keys.indexOf(device) === index
         );
@@ -64,7 +73,7 @@ export const DeviceListComponent = () => {
     };
 
     const setHDDCapacityKeys = () => {
-        const keys = list.map((device) => Number(device[HDD_CAPACITY]));
+        const keys = devicesList.map((device) => Number(device[HDD_CAPACITY]));
         const noDuplicateKeys = keys.filter(
             (device, index) => keys.indexOf(device) === index
         );
@@ -74,7 +83,7 @@ export const DeviceListComponent = () => {
 
     const updateDeviceModal = (details) => {
         setShowModal(true);
-        saveDeviceDetaiils(details);
+        saveDeviceDetails(details);
     };
 
     const closeModal = () => {
@@ -130,7 +139,6 @@ export const DeviceListComponent = () => {
         </Dropdown>;
     }
 
-
     const deviceDetailsHeader = () => {
         return (
             <div className="row ">
@@ -141,12 +149,7 @@ export const DeviceListComponent = () => {
         );
     };
 
-    // console.log('deviceTypeSortList', deviceTypeSortList);
-    // console.log('HDDCapacitySortList', HDDCapacitySortList);
-    // console.log('deviceTypeSortBy', deviceTypeSortBy);
-    // console.log('HDDCapacitySortBy', HDDCapacitySortBy);
-   // console.log('sortedDeviceList', sortedDeviceList);
-    return isLoading ? (
+    return isFetching ? (
         <div className="row">
             <div className="col-7 p-0 pt-5 d-flex justify-content-center">
                 <Loader type="TailSpin" color="#00BFFF" height={80} width={80} />
@@ -161,7 +164,7 @@ export const DeviceListComponent = () => {
             {deviceDetailsHeader()}
             <div className="row">
                 <div className="col-7 p-0">
-                    {sortedDeviceList.length === 0 && !isLoading ? <div>
+                    {sortedDeviceList.length === 0 && !isFetching ? <div>
                         No Systems match your search criteria
                     </div> :
                         <ul className="p-0">
@@ -197,6 +200,7 @@ export const DeviceListComponent = () => {
             </div>
             <UpdateModalComponent
                 deviceDetails={deviceDetails}
+                deviceTypeOptions={deviceTypeSortList}
                 show={showModal}
                 onHide={closeModal}
             />
