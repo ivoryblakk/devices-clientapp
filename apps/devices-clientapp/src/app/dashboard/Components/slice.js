@@ -35,6 +35,7 @@ const initialState = devicesListAdapter.getInitialState({
     isFetching: false,
     devicesList: [],
     error: null,
+    errorModal: null,
     addedDeviceDetails: '',
     updatedDevice: '',
     deletedDevice: ''
@@ -50,13 +51,13 @@ export const devicesList = createSlice({
             state.error = null
         })
         builder.addCase(addDevice.pending, (state) => {
-            state.error = null
+            state.errorModal = null
         })
         builder.addCase(updateDevice.pending, (state) => {
-            state.error = null
+            state.errorModal = null
         })
         builder.addCase(deleteDevice.pending, (state) => {
-            state.error = null
+            state.errorModal = null
         })
         builder.addCase(fetchDevices.fulfilled, (state, action) => {
             state.isFetching = false
@@ -77,13 +78,13 @@ export const devicesList = createSlice({
         })
         builder.addCase(addDevice.rejected, (state, action) => {
             state.isFetching = false
-            state.error = action.error
+            state.errorModal = action.error
         })
         builder.addCase(updateDevice.rejected, (state, action) => {
-            state.error = action.error
+            state.errorModal = action.error
         })
         builder.addCase(deleteDevice.rejected, (state, action) => {
-            state.error = action.error
+            state.errorModal = action.error
         })
     }
 })

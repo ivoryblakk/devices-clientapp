@@ -18,7 +18,8 @@ export const validateDeviceInput= (values )=>{
       errors.hdd_capacity = 'Required'
     }
 
-    if( (1 > hdd_capacity || isNotAWholeNumber )&& hdd_capacity ){
+    if( (1 > hdd_capacity || isNotAWholeNumber ) ){
+      console.log('hdd_capacity: ', hdd_capacity)
       errors.hdd_capacity = 'Please use a Valid Whole Number'
     }
 

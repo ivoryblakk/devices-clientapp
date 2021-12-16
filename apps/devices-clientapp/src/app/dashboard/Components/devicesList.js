@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { appleSVG, windowsSVG, pencilSVG } from '../../assets/Icons';
-import { UpdateModalComponent } from '../Components/updateModal';
-import { AddSystemModalComponent } from '../Components/addSystemModal';
+import { SystemListModalComponent } from '../Components/systemListModal';
 import { Dropdown, Button } from 'react-bootstrap'
 import Loader from 'react-loader-spinner';
 import { sortBy } from 'lodash';
@@ -9,31 +8,34 @@ import { parseTypeString } from '../../utilites/utility';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchDevices, devicesListSelector } from './slice';
 
-const MAC = 'MAC';
-const SYSTEM_NAME = 'system_name'
-const HDD_CAPACITY = 'hdd_capacity'
-const TYPE = 'type'
+export const MAC = 'MAC';
+export const SYSTEM_NAME = 'system_name'
+export const HDD_CAPACITY = 'hdd_capacity'
+export const TYPE = 'type'
+export const initialDeviceDetails ={
+    system_name: '',
+    type: '',
+    hdd_capacity: '',
+    id: '',
+}
+
 const A_Z = 'a_z'
 let deviceTypes = ['WINDOWS_WORKSTATION','WINDOWS_SERVER','MAC']
+
 
 export const DeviceListComponent = () => {
     const dispatch = useDispatch()
     const devicesList = useSelector(devicesListSelector.selectAll)
     const { isFetching, error, addedDeviceDetails, updatedDevice, deletedDevice } = useSelector(state => state.devicesList)
     const [showModal, setShowModal] = useState(false);
-    const [showAddSystemModal, setShowAddSystemModal] = useState(false);
+    const [isEditModal, setIsEditModal] = useState(false);
     const [sortedDeviceList, setSortedDeviceList] = useState([])
     const [deviceTypeSortList, setDeviceTypeSortList] = useState([]);
     const [HDDCapacitySortList, setHDDCapacitySortList] = useState([]);
     const [deviceNameSortBy, setDeviceNameSortBy] = useState('')
     const [deviceTypeSortBy, setDeviceTypeSortBy] = useState('');
     const [HDDCapacitySortBy, setHDDCapacitySortBy] = useState('');
-    const [deviceDetails, setDeviceDetails] = useState({
-        system_name: '',
-        type: '',
-        hdd_capacity: '',
-        id: '',
-    });
+    const [deviceDetails, setDeviceDetails] = useState(initialDeviceDetails);
 
     useEffect(() => {
         dispatch(fetchDevices())
@@ -54,10 +56,10 @@ export const DeviceListComponent = () => {
     const sortDevices = () => {
         let sortedList = devicesList
 
-        sortedList = deviceNameSortBy === A_Z ? sortBy(sortedList, (o) => o['system_name'].toLowerCase()) : devicesList;
+        sortedList = deviceNameSortBy === A_Z ? sortBy(sortedList, (o) => o[SYSTEM_NAME].toLowerCase()) : devicesList;
 
         if (deviceTypeSortBy) {
-            sortedList = sortedList.filter((device) => device.type === deviceTypeSortBy)
+            sortedList = sortedList.filter((device) => device[TYPE] === deviceTypeSortBy)
         }
         if (HDDCapacitySortBy) {
             sortedList = sortedList.filter((device) => Number(device[HDD_CAPACITY]) === HDDCapacitySortBy)
@@ -71,7 +73,7 @@ export const DeviceListComponent = () => {
 
     const setDeviceTypeKeys = () => {
          devicesList.map((device) => {
-           deviceTypes.includes(device.type)? null: deviceTypes.push(device.type)
+           deviceTypes.includes(device[TYPE])? null: deviceTypes.push(device[TYPE])
         });
 
         setDeviceTypeSortList(deviceTypes);
@@ -86,17 +88,14 @@ export const DeviceListComponent = () => {
         setHDDCapacitySortList(noDuplicateKeys.sort(sortHDDCapacity));
     };
 
-    const updateDeviceModal = (details) => {
-        setShowModal(true);
+    const handleDeviceListModal = (isEdit,details = initialDeviceDetails) => {
+        setIsEditModal(isEdit);
         saveDeviceDetails(details);
+        setShowModal(true);
     };
 
     const closeModal = () => {
         setShowModal(false);
-    };
-
-    const closeAddSystemModal = () => {
-        setShowAddSystemModal(false);
     };
 
     const deviceDetailsDropDown = () => {
@@ -147,7 +146,7 @@ export const DeviceListComponent = () => {
         return (
             <div className="row  pt-3">
                 <div className="col-7 bg-black p-2 ">
-                    <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={() => setShowAddSystemModal(true)}>Add System</Button></div>
+                    <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button id='add_system'onClick={() => handleDeviceListModal(false)}>Add System</Button></div>
                 </div>
             </div>
         );
@@ -175,7 +174,7 @@ export const DeviceListComponent = () => {
                     </div> :
                         <ul className="p-0">
                             {sortedDeviceList.map(({ system_name, type, hdd_capacity, id }) => (
-                                <li className="p-2 m-1 border shadow rounded" key={id}>
+                                <li className="p-2 m-1 border shadow rounded" key={id} >
                                     <div className="row">
                                         <div className="col-10">
                                             <p className="m-0"> {`System Name: ${system_name}`}</p>
@@ -188,7 +187,7 @@ export const DeviceListComponent = () => {
                                             <Button
                                                 className="bg-white btn-light"
                                                 onClick={() =>
-                                                    updateDeviceModal({
+                                                    handleDeviceListModal(true,{
                                                         system_name,
                                                         type,
                                                         hdd_capacity,
@@ -204,16 +203,12 @@ export const DeviceListComponent = () => {
                         </ul>}
                 </div>
             </div>
-            <UpdateModalComponent
+            <SystemListModalComponent
                 deviceDetails={deviceDetails}
                 deviceTypeOptions={deviceTypeSortList}
                 show={showModal}
                 onHide={closeModal}
-            />
-            <AddSystemModalComponent
-                deviceTypeOptions={deviceTypeSortList}
-                show={showAddSystemModal}
-                onHide={closeAddSystemModal}
+                isEditSystemDevice ={isEditModal}
             />
         </>
     );
