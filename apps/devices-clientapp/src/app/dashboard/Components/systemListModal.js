@@ -10,7 +10,7 @@ import { TYPE, SYSTEM_NAME, HDD_CAPACITY, initialDeviceDetails } from './devices
 export const SystemListModalComponent = ({ deviceTypeOptions, deviceDetails, show, onHide, isEditSystemDevice }) => {
   const dispatch = useDispatch()
   const title = isEditSystemDevice ? 'Edit System Details' : ' Add System Device'
-  const initialValues = isEditSystemDevice ? { system_name: deviceDetails[SYSTEM_NAME], type: deviceDetails[TYPE], hdd_capacity: deviceDetails[HDD_CAPACITY] } : initialDeviceDetails
+  const initialValues = isEditSystemDevice ? { system_name: deviceDetails[SYSTEM_NAME], type: deviceDetails[TYPE], hdd_capacity: Number(deviceDetails[HDD_CAPACITY]) } : initialDeviceDetails
   const { errorModal } = useSelector(state => state.devicesList)
 
   const handleAddSystem = async (values, { setSubmitting }) => {
