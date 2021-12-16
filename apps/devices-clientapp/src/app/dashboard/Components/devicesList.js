@@ -10,7 +10,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchDevices, devicesListSelector } from './slice';
 
 const MAC = 'MAC';
+const SYSTEM_NAME = 'system_name'
 const HDD_CAPACITY = 'hdd_capacity'
+const TYPE = 'type'
 const A_Z = 'a_z'
 let deviceTypes = ['WINDOWS_WORKSTATION','WINDOWS_SERVER','MAC']
 
@@ -65,7 +67,7 @@ export const DeviceListComponent = () => {
 
     }
 
-    const hasfilters = deviceTypeSortBy || deviceNameSortBy || HDDCapacitySortBy
+    const hasfiltersApplied = deviceTypeSortBy || deviceNameSortBy || HDDCapacitySortBy
 
     const setDeviceTypeKeys = () => {
          devicesList.map((device) => {
@@ -143,7 +145,7 @@ export const DeviceListComponent = () => {
 
     const deviceDetailsHeader = () => {
         return (
-            <div className="row ">
+            <div className="row  pt-3">
                 <div className="col-7 bg-black p-2 ">
                     <div className="d-flex flex-row justify-content-between">{systemNameDropDown()}  {deviceDetailsDropDown()}{hDDCapactityDropDown()} <Button onClick={() => setShowAddSystemModal(true)}>Add System</Button></div>
                 </div>
@@ -166,7 +168,7 @@ export const DeviceListComponent = () => {
             {deviceDetailsHeader()}
             <div className="row">
                 <div className="col-7 p-0">
-                    {sortedDeviceList.length === 0 && !isFetching && hasfilters  ? <div>
+                    {sortedDeviceList.length === 0 && !isFetching && hasfiltersApplied  ? <div>
                         No Systems match your search criteria
                     </div>: sortedDeviceList.length === 0 && !isFetching? <div> 
                         There are no System Devices

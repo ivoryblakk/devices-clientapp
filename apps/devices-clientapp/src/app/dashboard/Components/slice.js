@@ -83,7 +83,6 @@ export const devicesList = createSlice({
             state.error = action.error
         })
         builder.addCase(deleteDevice.rejected, (state, action) => {
-            state.isFetching = false
             state.error = action.error
         })
     }

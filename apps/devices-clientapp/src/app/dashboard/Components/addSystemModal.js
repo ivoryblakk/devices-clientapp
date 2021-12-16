@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import { addDevice } from './slice';
 import { useDispatch } from 'react-redux'
 import { parseTypeString } from '../../utilites/utility';
+import { validateDeviceInput } from '../../utilites/validation';
 
 export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => {
   const dispatch = useDispatch()
@@ -23,30 +24,10 @@ export const AddSystemModalComponent = ({ show, onHide, deviceTypeOptions }) => 
       <Modal.Body>
         <Formik
           initialValues={{ system_name: '', type: '', hdd_capacity: '' }}
-          validate={values => {
-            const errors = {};
-            if(!values.system_name){
-              errors.system_name = 'Required'
-            }
-            if(!/^[a-zA-Z-]+$/gm.test(values.system_name) && values.system_name){
-              errors.system_name = 'Please use Letters and/or hypens'
-            }
-            if(!values.type){
-              errors.type = 'Required'
-            }
-
-            if(!values.hdd_capacity){
-              errors.hdd_capacity = 'Required'
-            }
-
-            if( 1 >= values.hdd_capacity && values.hdd_capacity ){
-              errors.hdd_capacity = 'Please use a Valid Positive Number'
-            }
-            return errors;
-          }}
+          validate={(values) => validateDeviceInput(values)}
           onSubmit={ async(values, { setSubmitting }) => {
             const { system_name, type, hdd_capacity } = values
-            await dispatch(addDevice({ system_name, type, hdd_capacity }));
+            await dispatch(addDevice({ system_name: system_name.toUpperCase(), type,hdd_capacity: hdd_capacity }));
             setSubmitting(false);
             onHide();
           }}
